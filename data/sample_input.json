@@ -1,0 +1,12 @@
+{
+  "name": "Arjun Hareesh S",
+  "role": "AI Engineer",
+  "education": "B.Tech Computer Science",
+  "skills": ["Python", "C++", "Machine Learning", "FastAPI"],
+  "projects": [
+    "AI Resume Generator",
+    "3D Hand Gesture Control System"
+  ],
+  "experience": "Internship in backend development",
+  "target_role": "Backend / AI Engineer"
+}

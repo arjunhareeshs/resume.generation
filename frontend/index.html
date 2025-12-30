@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #a0a0a0;
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            min-height: 70vh;
+        }
+
+        /* Sidebar - Data Preview */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar h2 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-item {
+            margin-bottom: 20px;
+        }
+
+        .data-item label {
+            display: block;
+            font-size: 0.8em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .data-item .value {
+            font-size: 1em;
+            color: #fff;
+            padding: 10px 15px;
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #00d9ff;
+        }
+
+        .data-item .value.skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .skill-tag {
+            background: linear-gradient(135deg, #00d9ff20, #00ff8820);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .generate-btn .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid transparent;
+            border-top-color: #1a1a2e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Resume Display */
+        .resume-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resume-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .resume-header h2 {
+            font-size: 1.3em;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+            color: white;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Resume Content */
+        .resume-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 400px;
+            color: #666;
+            text-align: center;
+        }
+
+        .placeholder i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .placeholder p {
+            font-size: 1.2em;
+        }
+
+        /* Resume Styled Display */
+        .resume-document {
+            background: #fff;
+            color: #333;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .resume-document .name {
+            font-size: 2em;
+            font-weight: 700;
+            color: #1a1a2e;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .resume-document .role {
+            font-size: 1.2em;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .resume-document .section {
+            margin-bottom: 25px;
+        }
+
+        .resume-document .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #0f3460;
+            border-bottom: 2px solid #00d9ff;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .resume-document .section-content {
+            font-size: 0.95em;
+            line-height: 1.8;
+            color: #444;
+            white-space: pre-wrap;
+        }
+
+        /* Status Messages */
+        .status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .status.show {
+            transform: translateX(0);
+        }
+
+        .status.success {
+            background: linear-gradient(135deg, #00ff88, #00d9ff);
+            color: #1a1a2e;
+        }
+
+        .status.error {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: #fff;
+        }
+
+        .status.loading {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> AI Resume Generator</h1>
+            <p>Generate ATS-optimized resumes powered by AI</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar with Data -->
+            <div class="sidebar">
+                <h2><i class="fas fa-database"></i> Resume Data</h2>
+                
+                <div id="dataPreview">
+                    <div class="data-item">
+                        <label>Name</label>
+                        <div class="value" id="previewName">Loading...</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Role</label>
+                        <div class="value" id="previewRole">Loading...</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Education</label>
+                        <div class="value" id="previewEducation">Loading...</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Skills</label>
+                        <div class="value skills" id="previewSkills">Loading...</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Projects</label>
+                        <div class="value" id="previewProjects">Loading...</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Experience</label>
+                        <div class="value" id="previewExperience">Loading...</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Target Role</label>
+                        <div class="value" id="previewTarget">Loading...</div>
+                    </div>
+                </div>
+
+                <button class="generate-btn" id="generateBtn" onclick="generateResume()">
+                    <i class="fas fa-magic"></i>
+                    <span>Generate Resume</span>
+                </button>
+            </div>
+
+            <!-- Resume Panel -->
+            <div class="resume-panel">
+                <div class="resume-header">
+                    <h2><i class="fas fa-file-alt"></i> Generated Resume</h2>
+                    <div class="action-buttons" id="actionButtons" style="display: none;">
+                        <button class="action-btn copy-btn" onclick="copyResume()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="action-btn download-btn" onclick="downloadPDF()">
+                            <i class="fas fa-download"></i> Download PDF
+                        </button>
+                    </div>
+                </div>
+                <div class="resume-content" id="resumeContent">
+                    <div class="placeholder" id="placeholder">
+                        <i class="fas fa-file-invoice"></i>
+                        <p>Click "Generate Resume" to create your AI-powered resume</p>
+                    </div>
+                    <div class="resume-document" id="resumeDocument" style="display: none;">
+                        <!-- Resume will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Toast -->
+    <div class="status" id="statusToast">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span id="statusMessage">Generating...</span>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000';
+        let resumeText = '';
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadData);
+
+        async function loadData() {
+            try {
+                const response = await fetch(`${API_URL}/api/data`);
+                const data = await response.json();
+                
+                document.getElementById('previewName').textContent = data.name;
+                document.getElementById('previewRole').textContent = data.role;
+                document.getElementById('previewEducation').textContent = data.education;
+                document.getElementById('previewExperience').textContent = data.experience;
+                document.getElementById('previewTarget').textContent = data.target_role;
+                
+                // Skills as tags
+                document.getElementById('previewSkills').innerHTML = data.skills
+                    .map(s => `<span class="skill-tag">${s}</span>`).join('');
+                
+                // Projects
+                document.getElementById('previewProjects').innerHTML = data.projects.join('<br>');
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showStatus('error', 'Failed to load data. Make sure the server is running.');
+            }
+        }
+
+        async function generateResume() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div><span>Generating...</span>';
+            
+            showStatus('loading', 'AI is generating your resume... This may take a minute.');
+
+            try {
+                const response = await fetch(`${API_URL}/generate`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    resumeText = result.resume_text;
+                    renderResume(result.resume_text, result.data);
+                    showStatus('success', 'Resume generated successfully!');
+                    
+                    document.getElementById('actionButtons').style.display = 'flex';
+                    document.getElementById('placeholder').style.display = 'none';
+                    document.getElementById('resumeDocument').style.display = 'block';
+                } else {
+                    throw new Error('Generation failed');
+                }
+            } catch (error) {
+                showStatus('error', 'Failed to generate resume. Check if server and Ollama are running.');
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic"></i><span>Generate Resume</span>';
+            }
+        }
+
+        function renderResume(text, data) {
+            const sections = parseResume(text);
+            const doc = document.getElementById('resumeDocument');
+            
+            let html = `
+                <div class="name">${data.name}</div>
+                <div class="role">${data.role}</div>
+            `;
+
+            for (const [title, content] of Object.entries(sections)) {
+                if (content.trim()) {
+                    html += `
+                        <div class="section">
+                            <div class="section-title">${title}</div>
+                            <div class="section-content">${content}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            doc.innerHTML = html;
+        }
+
+        function parseResume(text) {
+            const sections = {};
+            const lines = text.split('\n');
+            let currentSection = '';
+            let currentContent = [];
+
+            const sectionNames = ['SUMMARY', 'SKILLS', 'PROJECTS', 'EXPERIENCE', 'EDUCATION'];
+
+            for (let i = 2; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (sectionNames.includes(line)) {
+                    if (currentSection) {
+                        sections[currentSection] = currentContent.join('\n').trim();
+                    }
+                    currentSection = line;
+                    currentContent = [];
+                } else if (currentSection) {
+                    currentContent.push(lines[i]);
+                }
+            }
+
+            if (currentSection) {
+                sections[currentSection] = currentContent.join('\n').trim();
+            }
+
+            return sections;
+        }
+
+        async function downloadPDF() {
+            showStatus('loading', 'Preparing PDF download...');
+            
+            try {
+                const response = await fetch(`${API_URL}/download-pdf`);
+                const blob = await response.blob();
+                
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'resume.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showStatus('success', 'PDF downloaded successfully!');
+            } catch (error) {
+                showStatus('error', 'Failed to download PDF');
+            }
+        }
+
+        function copyResume() {
+            navigator.clipboard.writeText(resumeText).then(() => {
+                showStatus('success', 'Resume copied to clipboard!');
+            }).catch(() => {
+                showStatus('error', 'Failed to copy');
+            });
+        }
+
+        function showStatus(type, message) {
+            const toast = document.getElementById('statusToast');
+            
+            toast.className = `status ${type} show`;
+            
+            let icon = '';
+            switch(type) {
+                case 'loading': icon = '<i class="fas fa-spinner fa-spin"></i>'; break;
+                case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
+                case 'error': icon = '<i class="fas fa-exclamation-circle"></i>'; break;
+            }
+            
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+            
+            if (type !== 'loading') {
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+        }
+    </script>
+</body>
+</html>
